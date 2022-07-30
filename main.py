@@ -1,9 +1,20 @@
 import random
 from PIL import Image
 
-def get_left(grid, coords): return grid[coords[0]][coords[1]-1]['right']
+def get_left(grid, coords):
+    return grid[coords[0]][coords[1]-1]['polarity'][1]
 
-def get_top(grid, coords): return grid[coords[0]-1][coords[1]]['bottom']
+def get_top(grid, coords):
+    return grid[coords[0]-1][coords[1]]['polarity'][2]
+
+def grab_blocks(lookup, west=None, north=None):
+    
+    blocks = []
+    for i in lookup.keys():
+        if (lookup[i]['polarity'][0] == north or north == None) and (lookup[i]['polarity'][3] == west or west == None):
+            blocks.append(lookup[i])
+    
+    return blocks
 
 def fill_grid(grid, lookup):
     for row in range(len(grid)):
@@ -17,24 +28,21 @@ def fill_grid(grid, lookup):
             else:
                 if row == 0:
                     # Check only Left
-                    left_values = get_left(grid, (row, col))
-                    choice = random.choice(left_values)
+                    left_value = get_left(grid, (row, col))
+                    possible_blocks = grab_blocks(lookup, west=left_value)
 
                 elif col == 0:
                     # Check only top
-                    top_values  = get_top(grid, (row, col))
-                    choice = random.choice(top_values)
+                    top_value  = get_top(grid, (row, col))
+                    possible_blocks = grab_blocks(lookup, north=top_value)
 
                 else:
-                    top_values  = get_top(grid, (row, col))
-                    left_values = get_left(grid, (row, col))
-                    values = []
-                    for value in top_values:
-                        if value in left_values:
-                            values.append(value)
-                    choice = random.choice(values)
+                    top_value  = get_top(grid, (row, col))
+                    left_value = get_left(grid, (row, col))
+                    possible_blocks = grab_blocks(lookup, west=left_value, north=top_value)
 
-                grid[row][col] = lookup[choice]
+                choice = random.choice(possible_blocks)
+                grid[row][col] = choice
 
 def make_image(grid):
     step = 16
@@ -51,42 +59,55 @@ def make_image(grid):
             image.paste(im, box=(x*step, y*step))
             x += 1
         y += 1
+        
+    image.save('test.png')
 
-    image.save('third.png')
+def main(size):
+    grid = [[None] * size for i in range(size)]
 
-def main():
-    grid = [[None] * 50 for i in range(50)]
-
-    blank =  './images/blank.png'
-    Tup =    './images/Tup.png'
-    Tdown =  './images/Tdown.png'
-    Tright = './images/Tright.png'
-    Tleft =  './images/Tleft.png'
+    blank =     './images/blank.png'
+    Tup =       './images/Tup.png'
+    Tdown =     './images/Tdown.png'
+    Tright =    './images/Tright.png'
+    Tleft =     './images/Tleft.png'
     crossroad = './images/crossroads.png'
-    PVc = './images/PipeVertical.png'
-    PHz = './images/PipeHorizontal.png'
-    BLElbow = './images/BottomLeftElbow.png'
-    BRElbow = './images/BottomRightElbow.png'
-    TLElbow = './images/TopLeftElbow.png'
-    TRElbow = './images/TopRightElbow.png'
+    PVc =       './images/PipeVertical.png'
+    PHz =       './images/PipeHorizontal.png'
+    BLElbow =   './images/BottomLeftElbow.png'
+    BRElbow =   './images/BottomRightElbow.png'
+    TLElbow =   './images/TopLeftElbow.png'
+    TRElbow =   './images/TopRightElbow.png'
+    D1 =        './images/deadend1.png'
+    D2 =        './images/deadend2.png'
+    D3 =        './images/deadend3.png'
+    D4 =        './images/deadend4.png'
 
+    # Blank  = 0
+    # Normal = 1
     lookup = {
-        'blank':     {'name': 'blank',     'image': blank,     'right': ['blank', 'Tright', 'PVc', 'BRElbow', 'TRElbow'],                    'left': ['blank',  'Tleft', 'PVc', 'BLElbow', 'TLElbow'],                                'top': ['blank', 'Tup', 'PHz', 'TLElbow', 'TRElbow'],                          'bottom': ['blank', 'Tdown', 'PHz', 'BLElbow', 'BRElbow']},
-        'Tup':       {'name': 'Tup',       'image': Tup,       'right': ['Tup', 'Tdown', 'Tleft', 'crossroad', 'PHz', 'BLElbow'],            'left': ['Tup', 'Tdown', 'Tright', 'crossroad', 'PHz', 'BRElbow', 'TLElbow', 'TRElbow'], 'top': ['Tdown', 'Tright', 'Tleft', 'crossroad', 'PVc', 'BLElbow', 'BRElbow'], 'bottom': ['blank', 'Tdown', 'PHz', 'BLElbow', 'BRElbow']},
-        'Tdown':     {'name': 'Tdown',     'image': Tdown,     'right': ['Tup', 'Tdown', 'Tleft', 'crossroad', 'PHz', 'BLElbow'],            'left': ['Tup', 'Tdown', 'Tright', 'crossroad', 'PHz', 'BRElbow', 'TLElbow', 'TRElbow'], 'top': ['blank', 'Tup', 'PHz', 'TLElbow', 'TRElbow'],                          'bottom': ['Tup', 'Tright', 'Tleft', 'crossroad', 'PVc', 'TLElbow', 'TRElbow']},
-        'Tright':    {'name': 'Tright',    'image': Tright,    'right': ['Tup', 'Tdown', 'Tleft', 'crossroad', 'PHz', 'BLElbow', 'TLElbow'], 'left': ['blank', 'Tleft', 'PVc', 'BLElbow', 'TLElbow'],                                 'top': ['Tdown', 'Tright', 'Tleft', 'crossroad', 'PVc', 'BLElbow', 'BRElbow'], 'bottom': ['Tup', 'Tright', 'Tleft', 'crossroad', 'PVc', 'TLElbow', 'TRElbow']},
-        'Tleft':     {'name': 'Tleft',     'image': Tleft,     'right': ['blank', 'Tright', 'PVc', 'BRElbow', 'TRElbow'],                    'left': ['Tup', 'Tdown', 'Tright', 'crossroad', 'PHz', 'BRElbow', 'TRElbow'],            'top': ['Tdown', 'Tright', 'Tleft', 'crossroad', 'PVc', 'BLElbow', 'BRElbow'], 'bottom': ['Tup', 'Tright', 'Tleft', 'crossroad', 'PVc', 'TLElbow', 'TRElbow']},
-        'BLElbow':   {'name': 'BLElbow',   'image': BLElbow,   'right': ['blank', 'Tright', 'PVc', 'BRElbow', 'TRElbow'],                    'left': ['Tdown', 'Tright', 'Tup', 'crossroad', 'PHz', 'BRElbow', 'TRElbow'],            'top': ['blank', 'Tup', 'PHz', 'TLElbow', 'TRElbow'],                          'bottom': ['Tleft', 'Tright', 'Tup', 'crossroad', 'PVc', 'TLElbow', 'TRElbow']},
-        'BRElbow':   {'name': 'BRElbow',   'image': BRElbow,   'right': ['Tdown', 'Tleft', 'Tup', 'crossroad', 'PHz', 'BLElbow', 'TLElbow'], 'left': ['blank', 'Tleft', 'PVc', 'BLElbow', 'TLElbow'],                                 'top': ['blank', 'Tup', 'PHz', 'TLElbow', 'TRElbow'],                          'bottom': ['Tleft', 'Tright', 'Tup', 'crossroad', 'PVc', 'TLElbow', 'TRElbow']},
-        'TLElbow':   {'name': 'TLElbow',   'image': TLElbow,   'right': ['blank', 'Tright', 'PVc', 'BRElbow', 'TRElbow'],                    'left': ['Tdown', 'Tright', 'Tup', 'crossroad', 'PHz', 'BRElbow', 'TRElbow'],            'top': ['Tdown', 'Tleft', 'Tright', 'crossroad', 'PVc', 'BLElbow', 'BRElbow'], 'bottom': ['blank', 'Tdown', 'PHz', 'BLElbow', 'BRElbow']},
-        'TRElbow':   {'name': 'TRElbow',   'image': TRElbow,   'right': ['Tdown', 'Tleft', 'Tup', 'crossroad', 'PHz', 'BLElbow', 'TLElbow'], 'left': ['blank', 'Tleft', 'PVc', 'BLElbow', 'TLElbow'],                                 'top': ['Tdown', 'Tleft', 'Tright', 'crossroad', 'PVc', 'BLElbow', 'BRElbow'], 'bottom': ['blank', 'Tdown', 'PHz', 'BLElbow', 'BRElbow']},
-        'crossroad': {'name': 'crossroad', 'image': crossroad, 'right': ['Tdown', 'Tleft', 'Tup', 'crossroad', 'PHz', 'BLElbow', 'TLElbow'], 'left': ['Tdown', 'Tright', 'Tup', 'crossroad', 'PHz', 'BRElbow', 'TRElbow'],            'top': ['Tdown', 'Tleft', 'Tright', 'crossroad', 'PVc', 'BLElbow', 'BRElbow'], 'bottom': ['Tleft', 'Tright', 'Tup', 'crossroad', 'PVc', 'TLElbow', 'TRElbow']},
-        'PHz':       {'name': 'PHz',       'image': PHz,       'right': ['Tdown', 'Tleft', 'Tup', 'crossroad', 'PHz', 'BLElbow', 'TLElbow'], 'left': ['Tdown', 'Tright', 'Tup', 'crossroad', 'PHz', 'TRElbow'],                       'top': ['blank', 'Tup', 'PHz', 'TLElbow', 'TRElbow'],                          'bottom': ['blank', 'Tdown', 'PHz', 'BLElbow']},
-        'PVc':       {'name': 'PVc',       'image': PVc,       'right': ['blank', 'Tright', 'PVc', 'BRElbow', 'TRElbow'],                    'left': ['blank', 'Tleft', 'PVc', 'BLElbow', 'TLElbow'],                                 'top': ['Tdown', 'Tleft', 'Tright', 'crossroad', 'PVc', 'BLElbow', 'BRElbow'], 'bottom': ['Tleft', 'Tright', 'Tup', 'crossroad', 'PVc', 'TLElbow', 'TRElbow']}
+        # name  :     N  E  S  W
+        'blank' :    {'image': blank,     'polarity': [0, 0, 0, 0]},
+        'Tup':       {'image': Tup,       'polarity': [1, 1, 0, 1]},
+        'Tdown':     {'image': Tdown,     'polarity': [0, 1, 1, 1]},
+        'Tright':    {'image': Tright,    'polarity': [1, 1, 1, 0]},
+        'Tleft':     {'image': Tleft,     'polarity': [1, 0, 1, 1]},
+        'BLElbow':   {'image': BLElbow,   'polarity': [0, 0, 1, 1]},
+        'BRElbow':   {'image': BRElbow,   'polarity': [0, 1, 1, 0]},
+        'TLElbow':   {'image': TLElbow,   'polarity': [1, 0, 0, 1]},
+        'TRElbow':   {'image': TRElbow,   'polarity': [1, 1, 0, 0]},
+        'crossroad': {'image': crossroad, 'polarity': [1, 1, 1, 1]},
+        'PHz':       {'image': PHz,       'polarity': [0, 1, 0, 1]},
+        'PVc':       {'image': PVc,       'polarity': [1, 0, 1, 0]},
+        'D1':        {'image': D1,        'polarity': [1, 0, 0, 1]},
+        'D1':        {'image': D2,        'polarity': [0, 0, 0, 1]},
+        'D1':        {'image': D3,        'polarity': [1, 1, 1, 1]},
+        'D1':        {'image': D4,        'polarity': [1, 1, 1, 1]}
+
     }
 
     fill_grid(grid, lookup)
     make_image(grid)
 
 if __name__ == '__main__':
-    main()
+    size = 10
+    main(size)
