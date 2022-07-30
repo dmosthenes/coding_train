@@ -81,6 +81,18 @@ def main(size):
     D2 =        './images/deadend2.png'
     D3 =        './images/deadend3.png'
     D4 =        './images/deadend4.png'
+    fd =        './images/forkdown.png'
+    fu =        './images/forkup.png'
+    fl =        './images/forkleft.png'
+    fr =        './images/forkright.png'
+    fed1 =      './images/forkenddown.png'
+    fed2 =      './images/forkenddown2.png'
+    feu1 =      './images/forkendup.png'
+    feu2 =      './images/forkendup2.png'
+    fer1 =      './images/forkendright.png'
+    fer2 =      './images/forkendright2.png'
+    fel1 =      './images/forkendleft.png'
+    fel2 =      './images/forkendleft2.png'
 
     # Blank  = 0
     # Normal = 1
@@ -99,9 +111,21 @@ def main(size):
         'PHz':       {'image': PHz,       'polarity': [0, 1, 0, 1]},
         'PVc':       {'image': PVc,       'polarity': [1, 0, 1, 0]},
         'D1':        {'image': D1,        'polarity': [1, 0, 0, 1]},
-        'D1':        {'image': D2,        'polarity': [0, 0, 0, 1]},
-        'D1':        {'image': D3,        'polarity': [1, 1, 1, 1]},
-        'D1':        {'image': D4,        'polarity': [1, 1, 1, 1]}
+        'D2':        {'image': D2,        'polarity': [0, 0, 0, 1]},
+        'D3':        {'image': D3,        'polarity': [1, 1, 1, 1]},
+        'D4':        {'image': D4,        'polarity': [1, 1, 1, 1]}
+        # 'fd':        {'image': fd,        'polarity': [1, 0, 2, 0]},
+        # 'fu':        {'image': fu,        'polarity': [2, 0, 1, 0]},
+        # 'fl':        {'image': fl,        'polarity': [0, 1, 0, 2]},
+        # 'fr':        {'image': fr,        'polarity': [0, 2, 0, 1]},
+        # 'fed1':      {'image': fed1,      'polarity': [0, 0, 2, 0]},
+        # 'fed2':      {'image': fed2,      'polarity': [0, 0, 2, 0]},
+        # 'feu1':      {'image': feu1,      'polarity': [2, 0, 0, 0]},
+        # 'feu2':      {'image': feu2,      'polarity': [2, 0, 0, 0]},
+        # 'fer1':      {'image': fer1,      'polarity': [0, 2, 0, 0]},
+        # 'fer2':      {'image': fer2,      'polarity': [0, 2, 0, 0]},
+        # 'fel1':      {'image': fel1,      'polarity': [0, 0, 0, 2]},
+        # 'fel2':      {'image': fel2,      'polarity': [0, 0, 0, 2]}
 
     }
 
@@ -109,5 +133,5 @@ def main(size):
     make_image(grid)
 
 if __name__ == '__main__':
-    size = 10
+    size = 150
     main(size)
