@@ -1,11 +1,9 @@
 import random
 from PIL import Image
 
-def get_left(grid, coords):
-    return grid[coords[0]][coords[1]-1]['right']
+def get_left(grid, coords): return grid[coords[0]][coords[1]-1]['right']
 
-def get_top(grid, coords):
-    return grid[coords[0]-1][coords[1]]['bottom']
+def get_top(grid, coords): return grid[coords[0]-1][coords[1]]['bottom']
 
 def fill_grid(grid, lookup):
     for row in range(len(grid)):
@@ -44,7 +42,6 @@ def make_image(grid):
     width = step*len(grid)
     image = Image.new(mode='RGB', size=(height, width), color=255)
 
-
     # Draw images
     y = 0
     for row in grid:
@@ -55,10 +52,10 @@ def make_image(grid):
             x += 1
         y += 1
 
-    image.save('e.png')
+    image.save('third.png')
 
 def main():
-    grid = [[None] * 10 for i in range(10)]
+    grid = [[None] * 50 for i in range(50)]
 
     blank =  './images/blank.png'
     Tup =    './images/Tup.png'
