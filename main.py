@@ -60,7 +60,7 @@ def make_image(grid):
             x += 1
         y += 1
         
-    image.save('test.png')
+    image.save('third_diagonals.png')
 
 def main(size):
     grid = [[None] * size for i in range(size)]
@@ -101,6 +101,12 @@ def main(size):
     fishup =      './images/fishup.png'
     fishleft =    './images/fishleft.png'
     fishright =   './images/fishright.png'
+    lrd1 =        './images/lrdiagonal1.png'
+    lrd2 =        './images/lrdiagonal2.png'
+    rld1 =        './images/rldiagonal1.png'
+    rld2 =        './images/rldiagonal2.png'
+    p1 =          './images/pipe1.png'
+    p2 =          './images/pipe2.png'
 
     # Blank  = 0
     # Normal = 1
@@ -141,12 +147,18 @@ def main(size):
         'fishdown':    {'image': fishdown,    'polarity': [1, 1, 2, 1]},
         'fishup':      {'image': fishup,      'polarity': [2, 1, 1, 1]},
         'fishleft':    {'image': fishleft,    'polarity': [1, 1, 1, 2]},
-        'fishright':   {'image': fishright,   'polarity': [1, 2, 1, 1]}
+        'fishright':   {'image': fishright,   'polarity': [1, 2, 1, 1]},
+        'lrd1':        {'image': lrd1,        'polarity': [2, 0, 2, 0]},
+        'lrd2':        {'image': lrd2,        'polarity': [0, 2, 0, 2]},
+        'rld1':        {'image': rld1,        'polarity': [2, 0, 2, 0]},
+        'rld2':        {'image': rld2,        'polarity': [0, 2, 0, 2]},
+        'p1':          {'image': p1,          'polarity': [2, 1, 2, 1]},
+        'p2':          {'image': p2,          'polarity': [1, 2, 1, 2]}
     }
 
     fill_grid(grid, lookup)
     make_image(grid)
 
 if __name__ == '__main__':
-    size = 150
+    size = 50
     main(size)

@@ -9,9 +9,21 @@ The program simply takes a lookup table as it iterates through the given array. 
 
 Some example images look like these. The first being 10x10, followed by 25x25, then 50x50.
 
-<img src='./images/first.png' width=200px>
-<img src='./images/second.png' width=200px>
-<img src='./images/third.png' width=200px>
+<img src='./markdown_images/first.png' width=200px>
+<img src='./markdown_images/second.png' width=200px>
+<img src='./markdown_images/third.png' width=200px>
+
+Depending on what you add in, the more complex items you add, the more complex your image will come out. The following 3 I added in some images that lead to a fork and those limit what happens across the board, leading to some more *interesting* results.
+
+<img src='./markdown_images/first_forks.png' width=200px>
+<img src='./markdown_images/second_forks.png' width=200px>
+<img src='./markdown_images/third_forks.png' width=200px>
+
+Adding in some more simple designs such as diagonals and general designs tend to allow for more complexity, with the result of more of a complex image than before.
+
+<img src='./markdown_images/first_diagonals.png' width=200px>
+<img src='./markdown_images/second_diagonals.png' width=200px>
+<img src='./markdown_images/third_diagonals.png' width=200px>
 
 While this isn't a "true" WFC program, it's a neat look into seeing a large map being generated and yielding different results while looking nice and crisp.
 
