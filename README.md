@@ -29,6 +29,20 @@ While this isn't a "true" WFC program, it's a neat look into seeing a large map 
 
 ---
 
+Most of the tilesets (with the exception of the grass_and_stone file) used came from The Coding Train, as well as using his video as a guide to my own solution for this problem. You can check out his video <a href="https://www.youtube.com/watch?v=rI_y2GAlQFM&t=3649s">here.</a>
+
+The Following images are from The Coding Train's Assets and are merely only used to show the adaptibility and view of other possibilities using other assets and tiles.
+
+<img src='./markdown_images/LowResCircuit.png' width=200px>
+<img src='./markdown_images/HighResCircuit.png' width=200px>
+<img src='./markdown_images/GrassTiles.png' width=200px>
+<img src='./markdown_images/Mountains.png' width=200px>
+<img src='./markdown_images/Pipes.png' width=200px>
+<img src='./markdown_images/PolkaDots.png' width=200px>
+<img src='./markdown_images/Rails.png' width=200px>
+
+---
+
 ### Resources used:
 ###### - Python
     - Python's Random Library
@@ -36,3 +50,4 @@ While this isn't a "true" WFC program, it's a neat look into seeing a large map 
 ###### - Krita (images)
 ###### - Visual Studio Code
 ###### - Git
+- [The Coding Train YouTube Video](https://www.youtube.com/watch?v=rI_y2GAlQFM&t=3649s)

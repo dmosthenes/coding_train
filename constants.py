@@ -1,91 +1,191 @@
-blank =       './images/blank.png'
-Tup =         './images/Tup.png'
-Tdown =       './images/Tdown.png'
-Tright =      './images/Tright.png'
-Tleft =       './images/Tleft.png'
-crossroad =   './images/crossroads.png'
-PVc =         './images/PipeVertical.png'
-PHz =         './images/PipeHorizontal.png'
-BLElbow =     './images/BottomLeftElbow.png'
-BRElbow =     './images/BottomRightElbow.png'
-TLElbow =     './images/TopLeftElbow.png'
-TRElbow =     './images/TopRightElbow.png'
-D1 =          './images/deadend1.png'
-D2 =          './images/deadend2.png'
-D3 =          './images/deadend3.png'
-D4 =          './images/deadend4.png'
-fd =          './images/forkdown.png'
-fu =          './images/forkup.png'
-fl =          './images/forkleft.png'
-fr =          './images/forkright.png'
-fed1 =        './images/forkenddown.png'
-fed2 =        './images/forkenddown2.png'
-feu1 =        './images/forkendup.png'
-feu2 =        './images/forkendup2.png'
-fer1 =        './images/forkendright.png'
-fer2 =        './images/forkendright2.png'
-fel1 =        './images/forkendleft.png'
-fel2 =        './images/forkendleft2.png'
-spiderdown =  './images/spiderdown.png'
-spiderup =    './images/spiderup.png'
-spiderleft =  './images/spiderleft.png'
-spiderright = './images/spiderright.png'
-fishdown =    './images/fishdown.png'
-fishup =      './images/fishup.png'
-fishleft =    './images/fishleft.png'
-fishright =   './images/fishright.png'
-lrd1 =        './images/lrdiagonal1.png'
-lrd2 =        './images/lrdiagonal2.png'
-rld1 =        './images/rldiagonal1.png'
-rld2 =        './images/rldiagonal2.png'
-p1 =          './images/pipe1.png'
-p2 =          './images/pipe2.png'
+from file_paths import *
 
-grassy_walkway = {
-    # name  :  N  E  S  W
-    'blank' :      {'image': blank,       'polarity': [0, 0, 0, 0]},
-    'Tup':         {'image': Tup,         'polarity': [1, 1, 0, 1]},
-    'Tdown':       {'image': Tdown,       'polarity': [0, 1, 1, 1]},
-    'Tright':      {'image': Tright,      'polarity': [1, 1, 1, 0]},
-    'Tleft':       {'image': Tleft,       'polarity': [1, 0, 1, 1]},
-    'BLElbow':     {'image': BLElbow,     'polarity': [0, 0, 1, 1]},
-    'BRElbow':     {'image': BRElbow,     'polarity': [0, 1, 1, 0]},
-    'TLElbow':     {'image': TLElbow,     'polarity': [1, 0, 0, 1]},
-    'TRElbow':     {'image': TRElbow,     'polarity': [1, 1, 0, 0]},
-    'crossroad':   {'image': crossroad,   'polarity': [1, 1, 1, 1]},
-    'PHz':         {'image': PHz,         'polarity': [0, 1, 0, 1]},
-    'PVc':         {'image': PVc,         'polarity': [1, 0, 1, 0]},
-    'D1':          {'image': D1,          'polarity': [1, 0, 0, 1]},
-    'D2':          {'image': D2,          'polarity': [0, 0, 0, 1]},
-    'D3':          {'image': D3,          'polarity': [1, 1, 1, 1]},
-    'D4':          {'image': D4,          'polarity': [1, 1, 1, 1]},
-    'fd':          {'image': fd,          'polarity': [1, 0, 2, 0]},
-    'fu':          {'image': fu,          'polarity': [2, 0, 1, 0]},
-    'fl':          {'image': fl,          'polarity': [0, 1, 0, 2]},
-    'fr':          {'image': fr,          'polarity': [0, 2, 0, 1]},
-    'fed1':        {'image': fed1,        'polarity': [0, 0, 2, 0]},
-    'fed2':        {'image': fed2,        'polarity': [0, 0, 2, 0]},
-    'feu1':        {'image': feu1,        'polarity': [2, 0, 0, 0]},
-    'feu2':        {'image': feu2,        'polarity': [2, 0, 0, 0]},
-    'fer1':        {'image': fer1,        'polarity': [0, 2, 0, 0]},
-    'fer2':        {'image': fer2,        'polarity': [0, 2, 0, 0]},
-    'fel1':        {'image': fel1,        'polarity': [0, 0, 0, 2]},
-    'fel2':        {'image': fel2,        'polarity': [0, 0, 0, 2]},
-    'spiderdown':  {'image': spiderdown,  'polarity': [1, 2, 2, 2]},
-    'spiderup':    {'image': spiderup,    'polarity': [2, 2, 1, 2]},
-    'spiderleft':  {'image': spiderleft,  'polarity': [2, 1, 2, 2]},
-    'spiderright': {'image': spiderright, 'polarity': [2, 2, 2, 1]},
-    'fishdown':    {'image': fishdown,    'polarity': [1, 1, 2, 1]},
-    'fishup':      {'image': fishup,      'polarity': [2, 1, 1, 1]},
-    'fishleft':    {'image': fishleft,    'polarity': [1, 1, 1, 2]},
-    'fishright':   {'image': fishright,   'polarity': [1, 2, 1, 1]},
-    'lrd1':        {'image': lrd1,        'polarity': [2, 0, 2, 0]},
-    'lrd2':        {'image': lrd2,        'polarity': [0, 2, 0, 2]},
-    'rld1':        {'image': rld1,        'polarity': [2, 0, 2, 0]},
-    'rld2':        {'image': rld2,        'polarity': [0, 2, 0, 2]},
-    'p1':          {'image': p1,          'polarity': [2, 1, 2, 1]},
-    'p2':          {'image': p2,          'polarity': [1, 2, 1, 2]}
+# ------------------------------------------------------- #
+
+circuits = {
+    # 0: Solid Grey | 1 Solid Green | 2 Green Pipe | 3 Grey Pipe | 4 Green and Grey Corner |
+    'CircuitGrey' :                 {'image': CircuitGrey,                'polarity': [0, 0, 0, 0], 'rotation': 0},
+    'CircuitGreen' :                {'image': CircuitGreen,               'polarity': [1, 1, 1, 1], 'rotation': 0},
+    'CircuitDeadEndRight' :         {'image': CircuitDeadEnd,             'polarity': [1, 2, 1, 1], 'rotation': 0},
+    'CircuitDeadEndUp' :            {'image': CircuitDeadEnd,             'polarity': [2, 1, 1, 1], 'rotation': 1},
+    'CircuitDeadEndLeft' :          {'image': CircuitDeadEnd,             'polarity': [1, 1, 1, 2], 'rotation': 2},
+    'CircuitDeadEndDown' :          {'image': CircuitDeadEnd,             'polarity': [1, 1, 2, 1], 'rotation': 3},
+    'CircuitGreyPipeH' :            {'image': CircuitGreyPipe,            'polarity': [1, 3, 1, 3], 'rotation': 0},
+    'CircuitGreyPipeV' :            {'image': CircuitGreyPipe,            'polarity': [3, 1, 3, 1], 'rotation': 1},
+    'CircuitGreenPipeEndRight' :    {'image': CircuitGreenPipeEnd,        'polarity': [4, 2, 4, 0], 'rotation': 0},
+    'CircuitGreenPipeEndUp' :       {'image': CircuitGreenPipeEnd,        'polarity': [2, 4, 0, 4], 'rotation': 1},
+    'CircuitGreenPipeEndLeft' :     {'image': CircuitGreenPipeEnd,        'polarity': [4, 0, 4, 2], 'rotation': 2},
+    'CircuitGreenPipeEndDown' :     {'image': CircuitGreenPipeEnd,        'polarity': [0, 4, 2, 4], 'rotation': 3},
+    'CircuitCornerLeft' :           {'image': CircuitCorner,              'polarity': [4, 1, 1, 4], 'rotation': 0},
+    'CircuitCornerDown' :           {'image': CircuitCorner,              'polarity': [1, 1, 4, 4], 'rotation': 1},
+    'CircuitCornerRight' :          {'image': CircuitCorner,              'polarity': [1, 4, 4, 1], 'rotation': 2},
+    'CircuitCornerUp' :             {'image': CircuitCorner,              'polarity': [4, 4, 1, 1], 'rotation': 3},
+    'CircuitGreenPipeH' :           {'image': CircuitGreenPipe,           'polarity': [1, 2, 1, 2], 'rotation': 0},
+    'CircuitGreenPipeV' :           {'image': CircuitGreenPipe,           'polarity': [2, 1, 2, 1], 'rotation': 1},
+    'CircuitPipeCross1' :           {'image': CircuitPipeCross,           'polarity': [3, 2, 3, 2], 'rotation': 0},
+    'CircuitPipeCross2' :           {'image': CircuitPipeCross,           'polarity': [2, 3, 2, 3], 'rotation': 1},
+    'CircuitGreyToGreenPipeH1' :    {'image': CircuitGreyToGreenPipe,     'polarity': [3, 1, 2, 1], 'rotation': 0},
+    'CircuitGreyToGreenPipeV1' :    {'image': CircuitGreyToGreenPipe,     'polarity': [1, 2, 1, 3], 'rotation': 1},
+    'CircuitGreyToGreenPipeH2' :    {'image': CircuitGreyToGreenPipe,     'polarity': [2, 1, 3, 1], 'rotation': 2},
+    'CircuitGreyToGreenPipeV2' :    {'image': CircuitGreyToGreenPipe,     'polarity': [1, 3, 1, 2], 'rotation': 3},
+    'CircuitGreenTBlockUp' :        {'image': CircuitGreenTBlock,         'polarity': [2, 2, 1, 2], 'rotation': 0},
+    'CircuitGreenTBlockLeft' :      {'image': CircuitGreenTBlock,         'polarity': [2, 1, 2, 2], 'rotation': 1},
+    'CircuitGreenTBlockDown' :      {'image': CircuitGreenTBlock,         'polarity': [1, 2, 2, 2], 'rotation': 2},
+    'CircuitGreenTBlockRight' :     {'image': CircuitGreenTBlock,         'polarity': [2, 2, 2, 1], 'rotation': 3},
+    'CircuitDoubleGreenDiagonal1' : {'image': CircuitDoubleGreenDiagonal, 'polarity': [2, 2, 2, 2], 'rotation': 0},
+    'CircuitDoubleGreenDiagonal2' : {'image': CircuitDoubleGreenDiagonal, 'polarity': [2, 2, 2, 2], 'rotation': 1},
+    'CircuitSingleGreenDiagonal1' : {'image': CircuitSingleGreenDiagonal, 'polarity': [2, 2, 1, 1], 'rotation': 0},
+    'CircuitSingleGreenDiagonal2' : {'image': CircuitSingleGreenDiagonal, 'polarity': [2, 1, 1, 2], 'rotation': 1},
+    'CircuitSingleGreenDiagonal3' : {'image': CircuitSingleGreenDiagonal, 'polarity': [1, 1, 2, 2], 'rotation': 2},
+    'CircuitSingleGreenDiagonal4' : {'image': CircuitSingleGreenDiagonal, 'polarity': [1, 2, 2, 1], 'rotation': 3},
+    'CircuitGreenToGreenH' :        {'image': CircuitGreenToGreen,        'polarity': [1, 2, 1, 2], 'rotation': 0},
+    'CircuitGreenToGreenV' :        {'image': CircuitGreenToGreen,        'polarity': [2, 1, 2, 1], 'rotation': 1}
 }
-
+circuit_coding_train = {
+    # 0: Solid Dark Purple | 1 Solid Light Purple | 2 Light Purple Pipe | 3 Light Blue Pipe | 4 Dark Purple Corner |
+    'CircuitGrey' :                 {'image': CCT_CircuitGrey,                'polarity': [0, 0, 0, 0], 'rotation': 0},
+    'CircuitGreen' :                {'image': CCT_CircuitGreen,               'polarity': [1, 1, 1, 1], 'rotation': 0},
+    'CircuitDeadEndRight' :         {'image': CCT_CircuitDeadEnd,             'polarity': [1, 2, 1, 1], 'rotation': 0},
+    'CircuitDeadEndUp' :            {'image': CCT_CircuitDeadEnd,             'polarity': [2, 1, 1, 1], 'rotation': 1},
+    'CircuitDeadEndLeft' :          {'image': CCT_CircuitDeadEnd,             'polarity': [1, 1, 1, 2], 'rotation': 2},
+    'CircuitDeadEndDown' :          {'image': CCT_CircuitDeadEnd,             'polarity': [1, 1, 2, 1], 'rotation': 3},
+    'CircuitGreyPipeH' :            {'image': CCT_CircuitGreyPipe,            'polarity': [1, 3, 1, 3], 'rotation': 0},
+    'CircuitGreyPipeV' :            {'image': CCT_CircuitGreyPipe,            'polarity': [3, 1, 3, 1], 'rotation': 1},
+    'CircuitGreenPipeEndRight' :    {'image': CCT_CircuitGreenPipeEnd,        'polarity': [4, 2, 4, 0], 'rotation': 0},
+    'CircuitGreenPipeEndUp' :       {'image': CCT_CircuitGreenPipeEnd,        'polarity': [2, 4, 0, 4], 'rotation': 1},
+    'CircuitGreenPipeEndLeft' :     {'image': CCT_CircuitGreenPipeEnd,        'polarity': [4, 0, 4, 2], 'rotation': 2},
+    'CircuitGreenPipeEndDown' :     {'image': CCT_CircuitGreenPipeEnd,        'polarity': [0, 4, 2, 4], 'rotation': 3},
+    'CircuitCornerLeft' :           {'image': CCT_CircuitCorner,              'polarity': [4, 1, 1, 4], 'rotation': 0},
+    'CircuitCornerDown' :           {'image': CCT_CircuitCorner,              'polarity': [1, 1, 4, 4], 'rotation': 1},
+    'CircuitCornerRight' :          {'image': CCT_CircuitCorner,              'polarity': [1, 4, 4, 1], 'rotation': 2},
+    'CircuitCornerUp' :             {'image': CCT_CircuitCorner,              'polarity': [4, 4, 1, 1], 'rotation': 3},
+    'CircuitGreenPipeH' :           {'image': CCT_CircuitGreenPipe,           'polarity': [1, 2, 1, 2], 'rotation': 0},
+    'CircuitGreenPipeV' :           {'image': CCT_CircuitGreenPipe,           'polarity': [2, 1, 2, 1], 'rotation': 1},
+    'CircuitPipeCross1' :           {'image': CCT_CircuitPipeCross,           'polarity': [3, 2, 3, 2], 'rotation': 0},
+    'CircuitPipeCross2' :           {'image': CCT_CircuitPipeCross,           'polarity': [2, 3, 2, 3], 'rotation': 1},
+    'CircuitGreyToGreenPipeH1' :    {'image': CCT_CircuitGreyToGreenPipe,     'polarity': [3, 1, 2, 1], 'rotation': 0},
+    'CircuitGreyToGreenPipeV1' :    {'image': CCT_CircuitGreyToGreenPipe,     'polarity': [1, 2, 1, 3], 'rotation': 1},
+    'CircuitGreyToGreenPipeH2' :    {'image': CCT_CircuitGreyToGreenPipe,     'polarity': [2, 1, 3, 1], 'rotation': 2},
+    'CircuitGreyToGreenPipeV2' :    {'image': CCT_CircuitGreyToGreenPipe,     'polarity': [1, 3, 1, 2], 'rotation': 3},
+    'CircuitGreenTBlockUp' :        {'image': CCT_CircuitGreenTBlock,         'polarity': [2, 2, 1, 2], 'rotation': 0},
+    'CircuitGreenTBlockLeft' :      {'image': CCT_CircuitGreenTBlock,         'polarity': [2, 1, 2, 2], 'rotation': 1},
+    'CircuitGreenTBlockDown' :      {'image': CCT_CircuitGreenTBlock,         'polarity': [1, 2, 2, 2], 'rotation': 2},
+    'CircuitGreenTBlockRight' :     {'image': CCT_CircuitGreenTBlock,         'polarity': [2, 2, 2, 1], 'rotation': 3},
+    'CircuitDoubleGreenDiagonal1' : {'image': CCT_CircuitDoubleGreenDiagonal, 'polarity': [2, 2, 2, 2], 'rotation': 0},
+    'CircuitDoubleGreenDiagonal2' : {'image': CCT_CircuitDoubleGreenDiagonal, 'polarity': [2, 2, 2, 2], 'rotation': 1},
+    'CircuitSingleGreenDiagonal1' : {'image': CCT_CircuitSingleGreenDiagonal, 'polarity': [2, 2, 1, 1], 'rotation': 0},
+    'CircuitSingleGreenDiagonal2' : {'image': CCT_CircuitSingleGreenDiagonal, 'polarity': [2, 1, 1, 2], 'rotation': 1},
+    'CircuitSingleGreenDiagonal3' : {'image': CCT_CircuitSingleGreenDiagonal, 'polarity': [1, 1, 2, 2], 'rotation': 2},
+    'CircuitSingleGreenDiagonal4' : {'image': CCT_CircuitSingleGreenDiagonal, 'polarity': [1, 2, 2, 1], 'rotation': 3},
+    'CircuitGreenToGreenH' :        {'image': CCT_CircuitGreenToGreen,        'polarity': [1, 2, 1, 2], 'rotation': 0},
+    'CircuitGreenToGreenV' :        {'image': CCT_CircuitGreenToGreen,        'polarity': [2, 1, 2, 1], 'rotation': 1}
+}
+grass_and_stone = {
+    # 0: Solid Green | 1 Pipe | 2 Double Pipe |
+    'blank' :              {'image': GrassBlank,        'polarity': [0, 0, 0, 0], 'rotation': 0},
+    'Tup':                 {'image': GrassTblock,       'polarity': [1, 1, 0, 1], 'rotation': 0},
+    'Tleft':               {'image': GrassTblock,       'polarity': [1, 0, 1, 1], 'rotation': 1},
+    'Tdown':               {'image': GrassTblock,       'polarity': [0, 1, 1, 1], 'rotation': 2},
+    'Tright':              {'image': GrassTblock,       'polarity': [1, 1, 1, 0], 'rotation': 3},
+    'BLElbow':             {'image': GrassElbow,        'polarity': [0, 0, 1, 1], 'rotation': 0},
+    'BRElbow':             {'image': GrassElbow,        'polarity': [0, 1, 1, 0], 'rotation': 1},
+    'TRElbow':             {'image': GrassElbow,        'polarity': [1, 1, 0, 0], 'rotation': 2},
+    'TLElbow':             {'image': GrassElbow,        'polarity': [1, 0, 0, 1], 'rotation': 3},
+    'crossroad':           {'image': GrassCrossroad,    'polarity': [1, 1, 1, 1], 'rotation': 0},
+    'PHz':                 {'image': GrassPipe,         'polarity': [0, 1, 0, 1], 'rotation': 0},
+    'PVc':                 {'image': GrassPipe,         'polarity': [1, 0, 1, 0], 'rotation': 1},
+    'GrassDoubleDeadend1': {'image': D1,                'polarity': [1, 0, 0, 1], 'rotation': 0},
+    'GrassDoubleDeadend2': {'image': D1,                'polarity': [0, 0, 1, 1], 'rotation': 1},
+    'GrassDoubleDeadend3': {'image': D1,                'polarity': [0, 1, 1, 0], 'rotation': 2},
+    'GrassDoubleDeadend4': {'image': D1,                'polarity': [1, 1, 0, 0], 'rotation': 3},
+    'GrassSinleDeadend1':  {'image': D2,                'polarity': [0, 0, 0, 1], 'rotation': 0},
+    'GrassSinleDeadend2':  {'image': D2,                'polarity': [0, 0, 1, 0], 'rotation': 1},
+    'GrassSinleDeadend3':  {'image': D2,                'polarity': [0, 1, 0, 0], 'rotation': 2},
+    'GrassSinleDeadend4':  {'image': D2,                'polarity': [1, 0, 0, 0], 'rotation': 3},
+    'GrassFrownyFace1':    {'image': D3,                'polarity': [1, 1, 1, 1], 'rotation': 0},
+    'GrassFrownyFace2':    {'image': D3,                'polarity': [1, 1, 1, 1], 'rotation': 1},
+    'GrassFrownyFace3':    {'image': D3,                'polarity': [1, 1, 1, 1], 'rotation': 2},
+    'GrassFrownyFace4':    {'image': D3,                'polarity': [1, 1, 1, 1], 'rotation': 3},
+    'GrassyForkDown':      {'image': GrassyFork,        'polarity': [1, 0, 2, 0], 'rotation': 0},
+    'GrassyForkRight':     {'image': GrassyFork,        'polarity': [0, 2, 0, 1], 'rotation': 1},
+    'GrassyForkUp':        {'image': GrassyFork,        'polarity': [2, 0, 1, 0], 'rotation': 2},
+    'GrassyForkLeft':      {'image': GrassyFork,        'polarity': [0, 1, 0, 2], 'rotation': 3},
+    'GrassyForkEndDown1':  {'image': GrassyForkEnd1,    'polarity': [0, 0, 2, 0], 'rotation': 0},
+    'GrassyForkEndRight1': {'image': GrassyForkEnd1,    'polarity': [0, 2, 0, 0], 'rotation': 1},
+    'GrassyForkEndUp1':    {'image': GrassyForkEnd1,    'polarity': [2, 0, 0, 0], 'rotation': 2},
+    'GrassyForkEndLeft1':  {'image': GrassyForkEnd1,    'polarity': [0, 0, 0, 2], 'rotation': 3},
+    'GrassyForkEndDown2':  {'image': GrassyForkEnd2,    'polarity': [0, 0, 2, 0], 'rotation': 0},
+    'GrassyForkEndRight2': {'image': GrassyForkEnd2,    'polarity': [0, 2, 0, 0], 'rotation': 1},
+    'GrassyForkEndUp1':    {'image': GrassyForkEnd2,    'polarity': [2, 0, 0, 0], 'rotation': 2},
+    'GrassyForkEndLeft1':  {'image': GrassyForkEnd2,    'polarity': [0, 0, 0, 2], 'rotation': 3},
+    'GrassySpiderDown':    {'image': GrassySpider,      'polarity': [1, 2, 2, 2], 'rotation': 0},
+    'GrassySpiderRight':   {'image': GrassySpider,      'polarity': [2, 2, 2, 1], 'rotation': 1},
+    'GrassySpiderUp':      {'image': GrassySpider,      'polarity': [2, 2, 1, 2], 'rotation': 2},
+    'GrassySpiderLeft':    {'image': GrassySpider,      'polarity': [2, 1, 2, 2], 'rotation': 3},
+    'GrassyFishDown':      {'image': GrassyFish,        'polarity': [1, 1, 2, 1], 'rotation': 0},
+    'GrassyFishRight':     {'image': GrassyFish,        'polarity': [1, 2, 1, 1], 'rotation': 1},
+    'GrassyFishUp':        {'image': GrassyFish,        'polarity': [2, 1, 1, 1], 'rotation': 2},
+    'GrassyFishLeft':      {'image': GrassyFish,        'polarity': [1, 1, 1, 2], 'rotation': 3},
+    'GrassyLRDiagonal1':   {'image': GrassyLRDiagonal,  'polarity': [2, 0, 2, 0], 'rotation': 0},
+    'GrassyLRDiagonal2':   {'image': GrassyLRDiagonal,  'polarity': [0, 2, 0, 2], 'rotation': 1},
+    'GrassyRLDiagonal1':   {'image': GrassyRLDiagonal,  'polarity': [2, 0, 2, 0], 'rotation': 0},
+    'GrassyRLDiagonal2':   {'image': GrassyRLDiagonal,  'polarity': [0, 2, 0, 2], 'rotation': 1},
+    'GrassyDeadendPipe1':  {'image': GrassyDeadendPipe, 'polarity': [2, 1, 2, 1], 'rotation': 0},
+    'GrassyDeadendPipe2':  {'image': GrassyDeadendPipe, 'polarity': [1, 2, 1, 2], 'rotation': 1}
+}
+mountains = {
+    # 0: Sun | 1: Clouds |
+    'Sun':        {'image': Sun,   'polarity': [0, 0, 0, 0], 'rotation': 0},
+    'CloudUp':    {'image': Cloud, 'polarity': [0, 1, 1, 1], 'rotation': 0},
+    'CloudLeft':  {'image': Cloud, 'polarity': [1, 1, 1, 0], 'rotation': 1},
+    'CloudDown':  {'image': Cloud, 'polarity': [1, 1, 0, 1], 'rotation': 2},
+    'CloudRight': {'image': Cloud, 'polarity': [1, 0, 1, 1], 'rotation': 3}
+}
+pipes = {
+    'BlankPipe': {'image': BlankPipe, 'polarity': [0, 0, 0, 0], 'rotation': 0},
+    'PipeDown':  {'image': TPipe,     'polarity': [0, 1, 1, 1], 'rotation': 0},
+    'PipeRight': {'image': TPipe,     'polarity': [1, 1, 1, 0], 'rotation': 1},
+    'PipeUp':    {'image': TPipe,     'polarity': [1, 1, 0, 1], 'rotation': 2},
+    'PipeLeft':  {'image': TPipe,     'polarity': [1, 0, 1, 1], 'rotation': 3}
+}
+polka = {
+    'BlankPolka': {'image': BlankPolka, 'polarity': [0, 0, 0, 0], 'rotation': 0},
+    'PolkaDown':  {'image': Polka,      'polarity': [0, 1, 1, 1], 'rotation': 0},
+    'PolkaRight': {'image': Polka,      'polarity': [1, 1, 1, 0], 'rotation': 1},
+    'PolkaUp':    {'image': Polka,      'polarity': [1, 1, 0, 1], 'rotation': 2},
+    'PolkaLeft':  {'image': Polka,      'polarity': [1, 0, 1, 1], 'rotation': 3}
+}
+rail = {
+    # 0: White | 1: Center | 2: Far Left | 3: Far Right |
+    'RailWhite':             {'image': RailWhite,          'polarity': [0, 0, 0, 0], 'rotation': 0},
+    'RailTRight':            {'image': RailT,              'polarity': [1, 1, 1, 0], 'rotation': 0},
+    'RailTUp':               {'image': RailT,              'polarity': [1, 1, 0, 1], 'rotation': 1},
+    'RailTLeft':             {'image': RailT,              'polarity': [1, 0, 1, 1], 'rotation': 2},
+    'RailTDown':             {'image': RailT,              'polarity': [0, 1, 1, 1], 'rotation': 3},
+    'RailTurnWide1':         {'image': RailTurnWide,       'polarity': [2, 3, 0, 0], 'rotation': 0},
+    'RailTurnWide2':         {'image': RailTurnWide,       'polarity': [3, 0, 0, 2], 'rotation': 1},
+    'RailTurnWide3':         {'image': RailTurnWide,       'polarity': [0, 0, 2, 3], 'rotation': 2},
+    'RailTurnWide4':         {'image': RailTurnWide,       'polarity': [0, 2, 3, 0], 'rotation': 3},
+    'RailStraightSideLeft':  {'image': RailStraightSide,   'polarity': [2, 0, 3, 0], 'rotation': 0},
+    'RailStraightSideDown':  {'image': RailStraightSide,   'polarity': [0, 3, 0, 2], 'rotation': 1},
+    'RailStraightSideRight': {'image': RailStraightSide,   'polarity': [3, 0, 2, 0], 'rotation': 2},
+    'RailStraightSideUp':    {'image': RailStraightSide,   'polarity': [0, 2, 0, 3], 'rotation': 3},
+    'RailTurnNarrow1':       {'image': RailTurnNarrow,     'polarity': [1, 1, 0, 0], 'rotation': 0},
+    'RailTurnNarrow2':       {'image': RailTurnNarrow,     'polarity': [1, 0, 0, 1], 'rotation': 1},
+    'RailTurnNarrow3':       {'image': RailTurnNarrow,     'polarity': [0, 0, 1, 1], 'rotation': 2},
+    'RailTurnNarrow4':       {'image': RailTurnNarrow,     'polarity': [0, 1, 1, 0], 'rotation': 3},
+    'RailStraightMiddleV':   {'image': RailStraightMiddle, 'polarity': [1, 0, 1, 0], 'rotation': 0},
+    'RailStraightMiddleH':   {'image': RailStraightMiddle, 'polarity': [0, 1, 0, 1], 'rotation': 1},
+    'RailCross':             {'image': RailCross,          'polarity': [1, 1, 1, 1], 'rotation': 0},
+}
 # ------------------------------------------ #
 
+tilesets = [
+    circuits,
+    circuit_coding_train,
+    grass_and_stone,
+    mountains,
+    pipes,
+    polka,
+    rail
+]
