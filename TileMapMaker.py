@@ -78,6 +78,7 @@ class CreateTileMap():
         file_name = (str) Whatever name you want to give the file.
         
         step = Usually the width in pixels of each image being used. Ex. 16
+        | However, you may choose to resize your image to a smaller scale using a smaller pixel step
         '''
         height = step*len(self.grid)
         width = step*len(self.grid)
