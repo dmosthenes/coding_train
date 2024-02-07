@@ -5,6 +5,20 @@ class TileCreator():
         self.images = []
 
         # Load all the images from the directory
+
+
+        # Loop over each image and create a dictionar of dictionaries
+        # Containing the pixel average for each section of edge
+        self.image_connections = {}
+
+        for image in self.images:
+
+            self.image_connections[image] = {}
+
+            # Loop over top, right, bottom, left
+
+
+
         
 
 class Tile():
