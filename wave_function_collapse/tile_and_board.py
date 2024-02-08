@@ -1,3 +1,9 @@
+from PIL import Image
+import os
+from itertools import product
+import math
+
+
 class TileCreator():
 
     def __init__(self, tile_directory):
@@ -5,32 +11,235 @@ class TileCreator():
         self.images = []
 
         # Load all the images from the directory
+        for image_name in os.listdir(tile_directory):
 
+            self.images.append(Image.open(os.path.join(tile_directory, image_name)))
 
-        # Loop over each image and create a dictionar of dictionaries
+    def generate_tiles(self):
+        # Loop over each image and create a dictionary of dictionaries
         # Containing the pixel average for each section of edge
-        self.image_connections = {}
 
-        for image in self.images:
+        # This dictionary is a mapping of the name for each side to a list of 
+        # tuples formatted as (colour average, image)
+        # Eg. self.sides["top"] returns a list of the colour average of the top
+        # of each image in the tileset with the image itself the [1] element of the tuple
+        self.sides = {}
 
-            self.image_connections[image] = {}
+        # A list of the names of the sides
+        name_of_sides = ["top", "right", "left", "bottom"]
 
-            # Loop over top, right, bottom, left
+        # Number the images / tiles
+        self.numbered_images = {}
+        for image_num, image in enumerate(self.images):
+
+            self.numbered_images[image_num] = image
+
+        # Initialise the four lists in the self.sides dictionary for each side
+        for side in name_of_sides:
+            self.sides[side] = []
+
+        # This dictionary is a mapping from each image number to a dictionary  in which 
+        # each side is a key and each value is the colour average for that side
+        # Eg. self.tile_maps[2]["top"] returns the colour average for the
+        # top of the second image.
+        self.tile_maps = {}
+
+        for image_num, image in self.numbered_images.items():
+            
+            self.tile_maps[image_num] = {}
+
+            for side in name_of_sides:
+                self.sides[side].append((average_colour_tuple(side, image, 3), image))
+                self.tile_maps[image_num][side] = self.sides[side][-1][0]
+
+        # Create a dictionary mapping each image to a dictionary of sides in which
+        # each side is mapped to a list of other images which are compatible for
+        # that side
+        # Eg. self.tile_to_tile[2]["top"] returns a list of other images which
+        # match with the top of the second image.
+        self.tile_to_tile = {}
+
+        for image_num, sides in self.tile_maps.items():
+
+            self.tile_to_tile[image_num] = {}
+
+            for side_name, side_value in sides.items():
+
+                self.tile_to_tile[image_num][side_name] = []
+
+                # Ex. compare top with other top
+                # Get other side list
+                for other_side_value, other_image in self.sides[opposite(side_name)]:
+
+                    if side_value == other_side_value:
+
+                        # Get number of other image
+                        other_image_num = -1
+                        for num_num, other_other_image in self.numbered_images.items():
+                            if other_other_image == other_image:
+                               other_image_num = num_num
+
+                        self.tile_to_tile[image_num][side_name].append(other_image_num)
+
+        # Initialise the Tile objects for each image
+        out = set()
+
+        for image_num, image in self.numbered_images.items():
+
+            out.add(Tile(image, self.tile_to_tile[image_num]))
+
+            # out.append(Tile(image, [self.numbered_images[image_num] for image_num in self.tile_to_tile[image_num]]))
+
+        self.tiles = out
+        return out
 
 
+def average_colour_tuple(side, image, n):
 
+    width, height = image.size
+    step = int(math.sqrt(width))
+
+    # Gather pixels along each edge of the image
+    match side:
+        case "top":
+            pixel_list = [image.getpixel((x, 0)) for x in range(0, width, step)]
+        case "right":
+            pixel_list = [image.getpixel((width-1, y)) for y in range(0, height, step)]
+        case "bottom":
+            pixel_list = [image.getpixel((x, height-1)) for x in range(0, width, step)]
+        case "left":
+            pixel_list = [image.getpixel((0, y)) for y in range(0, height, step)]
+
+    split_list = []
+
+    # split list into n parts
+    split_length = len(pixel_list) // n
+
+    for i in range(n):
+
+        if i == n - 1:
+            split_list.append(pixel_list[split_length * i:])
         
+        else:
+            split_list.append(pixel_list[split_length * i: split_length * (i + 1)])
+
+    # Iterate over each sublist and find the average
+    out = []
+
+    for sub_list in split_list:
+
+        avg = (0, 0, 0)
+
+        # Loop over each pixel in the sub_list
+        for pixel in sub_list:
+
+            avg = tuple(x + y for x,y in zip(avg, pixel))
+
+        out.append(tuple(x / len(sub_list) for x in avg))
+
+    # Return a tuple of colour average
+    return tuple(out)
+
+
+def opposite(side_name):
+
+    match side_name:
+        case "right":
+            return "left"
+        case "left":
+            return "right"
+        case "top":
+            return "bottom"
+        case "bottom":
+            return "top"
 
 class Tile():
 
-    def __init__(self, image):
+    def __init__(self, image, compatible_tiles):
 
-        self.tile = image
-        self.width
-        self.height
+        self.image = image
+        self.width, self.height = image.size
+        # List of numbers corresponding with numbered tiles dictionary
+        self.compatible_tiles = compatible_tiles
 
-        # Scan the edges to get the colour for three sections of each edge
+class Board():
+
+    def __init__(self, width, height, tiles, numbered_tiles):
+        # Create a Square for each position on the board
+        self.width = width
+        self.height = height
+        self.tiles = tiles
+        self.numbered_tiles = numbered_tiles
+        self.squares = []
+        # Create the squares for the board
+        for i,j in product(range(width), range(height)):
+            self.squares.append(Square(i,j,width,height))
+
+
+class Square():
+
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.neighbours = []
+
+        # Get coordinates for the neighbouring squares
+        for iter, (i,j) in enumerate(product(range(x -1, x+2), range(y-1, y+2))):
+            if i < 0 or i >= self.width or j < 0 or j >= self.height or iter % 2 == 0:
+                continue
+
+            self.neighbours.append((i,j))
+    
+    def __repr__(self):
+        # return f"{self.x}, {self.y}, {self.neighbours}"
+        return f"Square: ({self.x}, {self.y}) with neighbours: {self.neighbours}"
+    
+    def __hash__(self):
+        return (self.x, self.y)
+
+    def __eq__(self, other):
+        if isinstance(other, Square):
+            if (self.x, self.y) == (other.x, other.y):
+                return True
+        return False
+    
+    def __deepcopy__(self, memo):
+        new_square = Square(self.x, self.y, self.width, self.height)
+        memo[id(self)] = new_square
+        return new_square
+
+def main():
+
+    tile_maker = TileCreator(os.path.join("images", "circuit"))
+
+    tiles = tile_maker.generate_tiles()
+
+    # Print out which image numbers are possible for the top of the 0th tile
+    tile = tiles.pop()
+    tile = tiles.pop()
+    tile = tiles.pop()
+
+    for num, image in tile_maker.numbered_images.items():
+
+        if image == tile.image:
+
+            print(num)
+
+    tile.image.save("current_image.png")
+
+    print(tile.compatible_tiles)
+
+    for image_num, image in tile_maker.numbered_images.items():
+
+        if image_num in tile.compatible_tiles["right"]:
+
+            image.save(f"compat-{image_num}.png")
 
 
 
 
+
+if __name__ == "__main__":
+    main()
