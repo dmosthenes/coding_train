@@ -1,19 +1,36 @@
-from PIL import Image
+from PIL import Image, ImageChops
 import os
 from itertools import product
 import math
+import random
+import numpy as np
 
 
 class TileCreator():
 
-    def __init__(self, tile_directory):
+    def __init__(self, tile_directory, rotation=False):
 
         self.images = []
 
         # Load all the images from the directory
         for image_name in os.listdir(tile_directory):
 
-            self.images.append(Image.open(os.path.join(tile_directory, image_name)))
+            image = Image.open(os.path.join(tile_directory, image_name))
+
+            self.images.append(image)
+
+            # Rotate the image three times
+            if rotation:
+
+                rotated_images = [image.rotate(90 * i) for i in range(1,4)]
+
+                # Compare each image to each other image
+                mse_threshold = 1000
+                if all([mse(image, rotated_images[i], mse_threshold) for i in range(3)]):
+                    continue
+                else:
+                    self.images.extend(rotated_images)
+             
 
     def generate_tiles(self):
         # Loop over each image and create a dictionary of dictionaries
@@ -65,7 +82,7 @@ class TileCreator():
 
             for side_name, side_value in sides.items():
 
-                self.tile_to_tile[image_num][side_name] = []
+                self.tile_to_tile[image_num][side_name] = set()
 
                 # Ex. compare top with other top
                 # Get other side list
@@ -79,7 +96,7 @@ class TileCreator():
                             if other_other_image == other_image:
                                other_image_num = num_num
 
-                        self.tile_to_tile[image_num][side_name].append(other_image_num)
+                        self.tile_to_tile[image_num][side_name].add(other_image_num)
 
         # Initialise the Tile objects for each image
         out = set()
@@ -92,6 +109,16 @@ class TileCreator():
 
         self.tiles = out
         return out
+
+def mse(image1, image2, threshold):
+
+    diff = ImageChops.difference(image1, image2)
+    squared_diff = np.array(diff).astype(np.float32) ** 2
+    mse = np.mean(squared_diff)
+
+    if mse < threshold:
+        return True
+    return False
 
 
 def average_colour_tuple(side, image, n):
@@ -212,20 +239,24 @@ class Square():
 
 def main():
 
-    tile_maker = TileCreator(os.path.join("images", "circuit"))
+    tile_maker = TileCreator(os.path.join("images", "polka"), True)
 
     tiles = tile_maker.generate_tiles()
 
     # Print out which image numbers are possible for the top of the 0th tile
     tile = tiles.pop()
-    tile = tiles.pop()
-    tile = tiles.pop()
+    # tile = tiles.pop()
+    # tile = tiles.pop()
+    # tile = tiles.pop()
+    # tile = tiles.pop()
 
-    for num, image in tile_maker.numbered_images.items():
+    # for num, image in tile_maker.numbered_images.items():
 
-        if image == tile.image:
+    #     image.save(f"{num}.png")
 
-            print(num)
+    #     if image == tile.image:
+
+    #         print(num)
 
     tile.image.save("current_image.png")
 
