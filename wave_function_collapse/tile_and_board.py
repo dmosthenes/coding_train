@@ -2,11 +2,14 @@ from PIL import Image, ImageChops
 import os
 from itertools import product
 import math
-import random
 import numpy as np
 
 
 class TileCreator():
+    """
+    Takes a set of images and generates a set of objects of the Tile class.
+    Optionally rotates images as part of the set.
+    """
 
     def __init__(self, tile_directory, rotation=False):
 
@@ -33,6 +36,12 @@ class TileCreator():
              
 
     def generate_tiles(self):
+        """
+        Creates a dictionary of self.tiles and returns it, containing each tile
+        with a sub dictionary listing compatible tiles for each side of the given
+        tile.
+        """
+
         # Loop over each image and create a dictionary of dictionaries
         # Containing the pixel average for each section of edge
 
@@ -111,6 +120,9 @@ class TileCreator():
         return out
 
 def mse(image1, image2, threshold):
+    """
+    Returns True if images are similar within threshold, otherwise False.
+    """
 
     diff = ImageChops.difference(image1, image2)
     squared_diff = np.array(diff).astype(np.float32) ** 2
@@ -122,6 +134,9 @@ def mse(image1, image2, threshold):
 
 
 def average_colour_tuple(side, image, n):
+    """
+    Returns a tuple of three colour averages across a given edge: ((rgb), (rgb),(rgb)).
+    """
 
     width, height = image.size
     step = int(math.sqrt(width))
@@ -169,6 +184,9 @@ def average_colour_tuple(side, image, n):
 
 
 def opposite(side_name):
+    """
+    Returns the opoposite to the given side.
+    """
 
     match side_name:
         case "right":
@@ -181,6 +199,9 @@ def opposite(side_name):
             return "top"
 
 class Tile():
+    """
+    A Tile object with an image and compatible tiles dictionary.
+    """
 
     def __init__(self, image, compatible_tiles):
 
@@ -190,6 +211,11 @@ class Tile():
         self.compatible_tiles = compatible_tiles
 
 class Board():
+    """
+    A Board object containing a number of Square objects. Use the numbered_tiles
+    dictionary to convert from the numbered tiles listed in the compatible tiles
+    dictionary to actual images.
+    """
 
     def __init__(self, width, height, tiles, numbered_tiles):
         # Create a Square for each position on the board
@@ -204,20 +230,31 @@ class Board():
 
 
 class Square():
+    """
+    A Square object with a list of neighbours of the form (i,j) which constrain 
+    the tiles that may be placed adjacent.
+    """
 
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self.neighbours = []
+        self.neighbours = {}
 
         # Get coordinates for the neighbouring squares
         for iter, (i,j) in enumerate(product(range(x -1, x+2), range(y-1, y+2))):
             if i < 0 or i >= self.width or j < 0 or j >= self.height or iter % 2 == 0:
                 continue
 
-            self.neighbours.append((i,j))
+            if i == self.x -1:
+                self.neighbours["left"] = (i,j)
+            elif j == self.y -1:
+                self.neighbours["top"] = (i,j)
+            elif i == self.x +1:
+                self.neighbours["right"] = (i,j)
+            else:
+                self.neighbours["bottom"] = (i,j)
     
     def __repr__(self):
         # return f"{self.x}, {self.y}, {self.neighbours}"
@@ -239,38 +276,39 @@ class Square():
 
 def main():
 
-    tile_maker = TileCreator(os.path.join("images", "polka"), True)
+#     tile_maker = TileCreator(os.path.join("images", "polka"), True)
 
-    tiles = tile_maker.generate_tiles()
+#     tiles = tile_maker.generate_tiles()
 
-    # Print out which image numbers are possible for the top of the 0th tile
-    tile = tiles.pop()
-    # tile = tiles.pop()
-    # tile = tiles.pop()
-    # tile = tiles.pop()
-    # tile = tiles.pop()
+#     # Print out which image numbers are possible for the top of the 0th tile
+#     tile = tiles.pop()
+#     tile = tiles.pop()
+#     tile = tiles.pop()
+#     tile = tiles.pop()
+#     tile = tiles.pop()
 
-    # for num, image in tile_maker.numbered_images.items():
+#     for num, image in tile_maker.numbered_images.items():
 
-    #     image.save(f"{num}.png")
+#         image.save(f"{num}.png")
 
-    #     if image == tile.image:
+#         if image == tile.image:
 
-    #         print(num)
+#             print(num)
 
-    tile.image.save("current_image.png")
+#     tile.image.save("current_image.png")
 
-    print(tile.compatible_tiles)
+#     print(tile.compatible_tiles)
 
-    for image_num, image in tile_maker.numbered_images.items():
+#     for image_num, image in tile_maker.numbered_images.items():
 
-        if image_num in tile.compatible_tiles["right"]:
+#         if image_num in tile.compatible_tiles["right"]:
 
-            image.save(f"compat-{image_num}.png")
-
-
+#             image.save(f"compat-{image_num}.png")
 
 
+
+    s = Square(5, 15, 20, 20)
+    print(s.neighbours)
 
 if __name__ == "__main__":
     main()
