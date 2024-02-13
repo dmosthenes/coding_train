@@ -5,6 +5,7 @@ import copy
 import time
 import random
 import copy
+import cProfile
 
 INTERLEAVING = True
 
@@ -17,10 +18,21 @@ class WaveFunctionCollapse():
         self.window_height = height
         self.numbered_tiles = board.numbered_tiles
         self.board = board
+        self.latest_assignment = None
+        self.scaling_factor = (self.window_width / self.board.rows) / self.numbered_tiles[0].width
+
+
+        # Render each tile as a pygame surface
+        # self.tile_surfaces = {}
+        # for tile in self.tiles:
+        #     surface = self.convert_to_surface(tile.image)
+        #     self.tile_surfaces[tile] = surface
 
         # Each square may have any of the tiles to begin with
-        self.domains = {square : copy.deepcopy(self.tiles)
-                        for square in board.squares}
+        # self.domains = {square : copy.deepcopy(self.tiles)
+        #                 for square in board.squares}
+        self.domains = {square.coordinates : self.tiles
+                for square in board.squares}
         
         self.viewer = pygame.init()
         self.window = pygame.display.set_mode((self.window_width, self.window_height))
@@ -47,38 +59,47 @@ class WaveFunctionCollapse():
             assignment = self.solve()
 
             if self.complete(assignment) is True:
-                self.update_window(assignment)
+                self.update_window(None, assignment)
                 input("Close?")
                 running = False
         
         pygame.quit()
     
 
-    def convert_to_surface(self, image):
-        """
-        Take a PIL image and convert it to a pygame surface.
-        """
+    # def convert_to_surface(self, image):
+    #     """
+    #     Take a PIL image and convert it to a pygame surface.
+    #     """
 
-        image_data = image.tobytes()
+    #     image_data = image.tobytes()
 
-        width, height = image.size
+    #     width, height = image.size
 
-        return pygame.image.fromstring(image_data, (width, height), image.mode)
+    #     return pygame.image.fromstring(image_data, (width, height), image.mode)
 
 
-    def update_window(self, assignment):
+    def update_window(self, latest_assignment, assignment):
 
         # For each Square in the assignment dictionary, draw it to the screen
-        for square, tile in assignment.items():
+        if latest_assignment is None:
+            for (i,j), tile in assignment.items():
 
-            scaling_factor = (self.window_width / self.board.rows) / tile.width
+                scaled_surface = pygame.transform.scale(tile.surface, (tile.width * self.scaling_factor, tile.height * self.scaling_factor))
 
-            scaled_surface = pygame.transform.scale(self.convert_to_surface(tile.image),
-                                                    (tile.width * scaling_factor, tile.height * scaling_factor))
+                self.window.blit(scaled_surface, (i * tile.width * self.scaling_factor, j * tile.height * self.scaling_factor))
 
-            self.window.blit(scaled_surface, (square.x * tile.width * scaling_factor, square.y * tile.height * scaling_factor))
+                pygame.display.flip()
 
-        pygame.display.flip()
+        else:
+            # latest_assignment = (square, tile)
+            (i,j) = latest_assignment
+            tile = assignment[(i,j)]
+
+            scaled_surface = pygame.transform.scale(tile.surface, (tile.width * self.scaling_factor, tile.height * self.scaling_factor))
+
+            self.window.blit(scaled_surface, (i * tile.width * self.scaling_factor, j * tile.height * self.scaling_factor))
+
+            pygame.display.flip()
 
 
     def solve(self):
@@ -89,20 +110,21 @@ class WaveFunctionCollapse():
         assignment = {}
 
         # Make an initial random assignment in or around the middle
-        middle_square = Square(round(self.board.rows / 2), round(self.board.cols / 2), self.board.cols, self.board.rows)
-        
+        # middle_square = Square(round(self.board.rows / 2), round(self.board.cols / 2), self.board.cols, self.board.rows)
+        middle_square = (round(self.board.rows / 2), round(self.board.cols / 2))
+
         assignment[middle_square] = self.domains[middle_square].pop()
         self.domains[middle_square] = set()
         self.domains[middle_square].add(assignment[middle_square])
 
-        self.update_window(assignment)
+        # self.update_window(assignment)
 
         self.ac3({s for s in assignment.keys()})
 
         if not INTERLEAVING:
             self.backtrack(assignment)
         else:
-            self.backtrack_with_interleaving(assignment)
+            self.backtrack_with_interleaving(assignment, middle_square)
 
         return assignment
 
@@ -146,11 +168,14 @@ class WaveFunctionCollapse():
         if len(self.domains[x]) != 1:
             return False
         
+        # Get x Square object
+        x_square = self.board.squares[x[0] * self.board.rows + x[1]]
+        
         # Get x's neighbours
-        for side, (i,j) in x.neighbours.items():
+        for side, neigh_square in x_square.neighbours.items():
 
             # Create the neighbouring square
-            neigh_square = Square(i,j,self.board.cols,self.board.rows)
+            # neigh_square = Square(i,j,self.board.cols,self.board.rows)
 
             # Get compatible tiles for x on given side
             compat_tiles_num = copy.copy(self.domains[x]).pop().compatible_tiles[side]
@@ -189,19 +214,19 @@ class WaveFunctionCollapse():
         # sides = ["top", "right", "bottom", "left"]
 
         # Iterate over the assignment dictionary
-        for square, tile in assignment.items():
+        for (i,j), tile in assignment.items():
 
             # Check that each neighbour that is assigned is a compatible tile
-            neighbours = square.neighbours
+            neighbours = self.board.squares[i * self.board.rows + j].neighbours
 
             for side in neighbours.keys():
 
-                i, j = neighbours[side]
+                neigh_square = neighbours[side]
 
                 # Convert combatible tiles from numbers
                 compat_tiles = {self.numbered_tiles[c] for c in tile.compatible_tiles[side]}
 
-                neigh_square = Square(i, j, self.board.cols, self.board.rows)
+                # neigh_square = Square(i, j, self.board.cols, self.board.rows)
                 if neigh_square in assignment:
                     if assignment[neigh_square] not in compat_tiles:
                         return False
@@ -220,7 +245,7 @@ class WaveFunctionCollapse():
         
         # Update visualisation
         time.sleep(0.1)
-        self.update_window(assignment)
+        self.update_window(self.latest_assignment, assignment)
         
         # Recursive bit
 
@@ -232,6 +257,8 @@ class WaveFunctionCollapse():
         for tile in tiles:
 
             assignment[square] = tile
+
+            self.latest_assignment = square
 
             if self.consistent(assignment):
 
@@ -252,7 +279,7 @@ class WaveFunctionCollapse():
         return None
     
 
-    def backtrack_with_interleaving(self, assignment):
+    def backtrack_with_interleaving(self, assignment, latest_assignment):
         """
         Perform backtracking serach with inferences to return a complete assignment
         dictionary.
@@ -263,13 +290,14 @@ class WaveFunctionCollapse():
             return assignment
         
         # Update visualisation
-        self.update_window(assignment)
+        self.update_window(latest_assignment, assignment)
 
         # Select an unassigned square
-        square = self.select_unassigned_variable(assignment)
+        square = self.select_unassigned_variable_deprecated(assignment)
         tiles = self.order_domain_values(square)
 
-        domains_copy = copy.deepcopy(self.domains)
+        # domains_copy = copy.deepcopy(self.domains)
+        domains_copy = self.domains.copy()
 
         # Iterate over possible values
         for tile in tiles:
@@ -285,7 +313,7 @@ class WaveFunctionCollapse():
                 if not self.ac3({s for s in assignment.keys()}):
                     continue
 
-                result = self.backtrack_with_interleaving(assignment)
+                result = self.backtrack_with_interleaving(assignment, square)
                 if result:
                     return result
                 
@@ -294,8 +322,28 @@ class WaveFunctionCollapse():
 
         return None
 
-
     def select_unassigned_variable(self, assignment):
+        """
+        Pick random Square and return a neighbour not in assignment.
+        """
+
+        for i,j in assignment.keys():
+            
+            neighbours = list(self.board.squares[i * self.board.rows + j].neighbours.values())
+
+            # neighbours = list(square.neighbours.values())
+            random.shuffle(neighbours)
+
+            for neigh_square in neighbours:
+
+                # neigh_square = Square(i,j,self.board.cols,self.board.rows)
+
+                if neigh_square not in assignment:
+
+                    return neigh_square
+
+
+    def select_unassigned_variable_deprecated(self, assignment):
         """
         Return an unassigned Square not already assigned in assignment.
         Choose the cell with the minimum number of remaining values
@@ -306,15 +354,15 @@ class WaveFunctionCollapse():
         unassigned_list = []
 
         # Each square has an assigned tile
-        for square in assignment.keys():
+        for (i,j) in assignment.keys():
 
             neighbours = set()
 
             # Get neighbouring squares
-            for i,j in square.neighbours.values():
+            for neigh_square in self.board.squares[i * self.board.rows + j].neighbours.values():
 
                 # Create neighbour square
-                neigh_square = (Square(i, j, self.board.cols, self.board.rows))
+                # neigh_square = (Square(i, j, self.board.cols, self.board.rows))
 
                 neighbours.add((neigh_square, len(self.domains[neigh_square])))
 
@@ -331,58 +379,65 @@ class WaveFunctionCollapse():
         """
 
         available_tiles = self.domains[square]
-        # neighbours = square.neighbours
+        neighbours = self.board.squares[square[0] * self.board.rows + square[1]].neighbours
 
-        out = [tile for tile in available_tiles]
-        random.shuffle(out)
-        return out
+        # out = [tile for tile in available_tiles]
+        # random.shuffle(out)
+        # return out
 
-        # values = []
+        values = []
 
         # code for returning values sorted by ruling out the fewest first
-        # for tile in available_tiles:
+        for tile in available_tiles:
 
-        #     total = 0
+            total = 0
 
             # For each neighbour, consider how many tiles fit if the
             # current tile was selected
-            # for side in neighbours.keys():
+            for side in neighbours.keys():
 
-            #     i,j = neighbours[side]
+                current_square = neighbours[side]
 
-            #     current_square = Square(i, j, self.board.cols, self.board.rows)
+                # current_square = Square(i, j, self.board.cols, self.board.rows)
 
-            #     # This is a set of Tile
-            #     possible_tiles = self.domains[current_square]
+                # This is a set of Tile
+                possible_tiles = self.domains[current_square]
 
-            #     # This is a set of Int
-            #     compat_tiles_ints = tile.compatible_tiles[side]
+                # This is a set of Int
+                compat_tiles_ints = tile.compatible_tiles[side]
 
-            #     # Convert to a set of Tile
-            #     compat_tiles = {self.numbered_tiles[tile] for tile in compat_tiles_ints}
+                # Convert to a set of Tile
+                compat_tiles = {self.numbered_tiles[tile] for tile in compat_tiles_ints}
 
-            #     overlap = possible_tiles.intersection(compat_tiles)
+                overlap = possible_tiles.intersection(compat_tiles)
 
-            #     total += len(overlap)
+                total += len(overlap)
 
-            # values.append((tile, total))
+            values.append((tile, total))
 
         # Return the sorted list
-        # out = [x[0] for x in sorted(values, key=lambda x:x[1], reverse=True)]
-        # random.shuffle(out)
-        # return out
+        out = [x[0] for x in sorted(values, key=lambda x:x[1], reverse=True)]
+        random.shuffle(out)
+        return out
 
 
 def main():
 
+    # time.sleep(5)
+
     width = 800
     height = 800
 
-    rows = 10
-    cols = 10
+    rows = 20
+    cols = 20
+
+    # self.scaling_factor = (self.window_width / self.board.rows) / self.numbered_tiles[0].width
+
+
+    scaling_factor_numerator = round(width / rows)
 
     # Create a TileCreator
-    tile_maker = TileCreator(os.path.join("images", "circuit-coding-train"), False)
+    tile_maker = TileCreator(os.path.join("images", "circuit"), scaling_factor_numerator, True)
     tiles = tile_maker.generate_tiles()
 
     # Get tile numbers
@@ -392,6 +447,8 @@ def main():
     # Set the number of rows and columns
     board = Board(rows, cols, tiles, numbered_tiles)
 
+    quit
+
     # Set the window resolution
     wfc = WaveFunctionCollapse(tiles, width, height, board)
 
@@ -399,4 +456,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # cProfile.run('main()')
     main()

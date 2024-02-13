@@ -12,7 +12,7 @@ class TileCreator():
     Optionally rotates images as part of the set.
     """
 
-    def __init__(self, tile_directory, rotation=False):
+    def __init__(self, tile_directory, scaling_factor, rotation=False):
 
         self.images = []
 
@@ -20,6 +20,8 @@ class TileCreator():
         for image_name in os.listdir(tile_directory):
 
             image = Image.open(os.path.join(tile_directory, image_name))
+            width, height = image.size
+            image = image.resize((scaling_factor, scaling_factor))
 
             self.images.append(image)
 
@@ -127,7 +129,7 @@ class TileCreator():
         return out
 
 
-def mse(image1, image2, threshold):
+def mse_deprecated(image1, image2, threshold):
     """
     Returns True if images are similar within threshold, otherwise False.
     """
@@ -139,6 +141,25 @@ def mse(image1, image2, threshold):
     if mse < threshold:
         return True
     return False
+
+def mse(image1, image2, threshold):
+    """
+    Returns True if images are similar within threshold, otherwise False.
+    """
+
+    # Convert images to Numpy arrays
+    array1 = np.array(image1).astype(np.float32)
+    array2 = np.array(image2).astype(np.float32)
+
+    # Calculate squared difference
+    squared_diff = (array1 - array2) ** 2
+
+    # Calculate mean squared error
+    mse = np.mean(squared_diff)
+
+    # Check if MSE is within threshold
+    return mse < threshold
+
 
 def average_colour_tuple(side, image, n):
     """
@@ -263,6 +284,13 @@ class Tile():
         # List of numbers corresponding with numbered tiles dictionary
         self.compatible_tiles = compatible_tiles
 
+        image_data = image.tobytes()
+
+        width, height = image.size
+
+        self.surface = pygame.image.fromstring(image_data, (width, height), image.mode)
+    
+    
     def __eq__(self, other):
 
         return self.image == other.image
@@ -296,6 +324,7 @@ class Square():
     """
 
     def __init__(self, x, y, width, height):
+        self.coordinates = (x,y)
         self.x = x
         self.y = y
         self.width = width
