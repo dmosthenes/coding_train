@@ -3,6 +3,7 @@ import os
 from itertools import product
 import math
 import numpy as np
+import pygame
 
 
 class TileCreator():
@@ -110,14 +111,21 @@ class TileCreator():
         # Initialise the Tile objects for each image
         out = set()
 
+        self.numbered_tiles = {}
+
         for image_num, image in self.numbered_images.items():
 
-            out.add(Tile(image, self.tile_to_tile[image_num]))
+            tile = Tile(image, self.tile_to_tile[image_num])
+
+            out.add(tile)
+
+            self.numbered_tiles[image_num] = tile
 
             # out.append(Tile(image, [self.numbered_images[image_num] for image_num in self.tile_to_tile[image_num]]))
 
         self.tiles = out
         return out
+
 
 def mse(image1, image2, threshold):
     """
@@ -132,10 +140,53 @@ def mse(image1, image2, threshold):
         return True
     return False
 
-
 def average_colour_tuple(side, image, n):
     """
-    Returns a tuple of three colour averages across a given edge: ((rgb), (rgb),(rgb)).
+    Returns a tuple of n colour averages across a given edge: ((rgb), (rgb),(rgb)).
+    """
+
+    width, height = image.size
+
+    # Gather pixels along each edge of the image
+    match side:
+        case "top":
+            pixel_list = [image.getpixel((x, 0)) for x in range(0, width)]
+        case "right":
+            pixel_list = [image.getpixel((width-1, y)) for y in range(0, height)]
+        case "bottom":
+            pixel_list = [image.getpixel((x, height-1)) for x in range(0, width)]
+        case "left":
+            pixel_list = [image.getpixel((0, y)) for y in range(0, height)]
+
+    split_list = []
+
+    # split list into n parts
+    split_length = len(pixel_list) // n
+
+    for i in range(n):
+
+        if i == n - 1:
+            split_list.append(pixel_list[split_length * i:])
+        
+        else:
+            split_list.append(pixel_list[split_length * i: split_length * (i + 1)])
+
+    # Iterate over each sublist and find the average
+    out = []
+
+    for sub_list in split_list:
+
+        # Pick middle pixel
+        pix = sub_list[round(len(sub_list) / 2)]
+
+        out.append(pix)
+
+    return tuple(out)
+
+
+def average_colour_tuple_deprecated(side, image, n):
+    """
+    Returns a tuple of n colour averages across a given edge: ((rgb), (rgb),(rgb)).
     """
 
     width, height = image.size
@@ -170,6 +221,7 @@ def average_colour_tuple(side, image, n):
 
     for sub_list in split_list:
 
+        # Code for averaging out pixels in sub-list
         avg = (0, 0, 0)
 
         # Loop over each pixel in the sub_list
@@ -198,6 +250,7 @@ def opposite(side_name):
         case "bottom":
             return "top"
 
+
 class Tile():
     """
     A Tile object with an image and compatible tiles dictionary.
@@ -210,6 +263,13 @@ class Tile():
         # List of numbers corresponding with numbered tiles dictionary
         self.compatible_tiles = compatible_tiles
 
+    def __eq__(self, other):
+
+        return self.image == other.image
+    
+    def __hash__(self):
+        return hash(self.image.tobytes())
+
 class Board():
     """
     A Board object containing a number of Square objects. Use the numbered_tiles
@@ -217,16 +277,16 @@ class Board():
     dictionary to actual images.
     """
 
-    def __init__(self, width, height, tiles, numbered_tiles):
+    def __init__(self, rows, cols, tiles, numbered_tiles):
         # Create a Square for each position on the board
-        self.width = width
-        self.height = height
+        self.rows = rows
+        self.cols = cols
         self.tiles = tiles
         self.numbered_tiles = numbered_tiles
         self.squares = []
         # Create the squares for the board
-        for i,j in product(range(width), range(height)):
-            self.squares.append(Square(i,j,width,height))
+        for i,j in product(range(rows), range(cols)):
+            self.squares.append(Square(i,j,rows,cols))
 
 
 class Square():
@@ -258,10 +318,12 @@ class Square():
     
     def __repr__(self):
         # return f"{self.x}, {self.y}, {self.neighbours}"
-        return f"Square: ({self.x}, {self.y}) with neighbours: {self.neighbours}"
+        return f"Square: ({self.x}, {self.y})"
+
+        # return f"Square: ({self.x}, {self.y}) with neighbours: {self.neighbours}"
     
     def __hash__(self):
-        return (self.x, self.y)
+        return hash((self.x, self.y))
 
     def __eq__(self, other):
         if isinstance(other, Square):
@@ -273,6 +335,32 @@ class Square():
         new_square = Square(self.x, self.y, self.width, self.height)
         memo[id(self)] = new_square
         return new_square
+
+
+def test_compat(directory):
+
+    tile_maker = TileCreator(directory, True)
+    tiles = tile_maker.generate_tiles()
+
+    os.mkdir("Test")
+
+    for i, tile in enumerate(tiles):
+
+        os.mkdir(os.path.join("test", f"{i}"))
+
+        for side, other_tiles in tile.compatible_tiles.items():
+
+            os.mkdir(os.path.join("test", f"{i}", f"{side}"))
+
+            for j, other_tile in enumerate(other_tiles):
+
+                other_image = tile_maker.numbered_images[other_tile]
+
+                other_image.save(os.path.join("test", f"{i}", f"{side}", f"{j}.png"))
+
+            tile.image.save(os.path.join("test", f"{i}", f"{side}", "current_image.png"))
+
+
 
 def main():
 
@@ -307,8 +395,10 @@ def main():
 
 
 
-    s = Square(5, 15, 20, 20)
-    print(s.neighbours)
+    # s = Square(5, 15, 20, 20)
+    # print(s.neighbours)
+
+    test_compat(os.path.join("images", "grass_and_stone"))
 
 if __name__ == "__main__":
     main()
