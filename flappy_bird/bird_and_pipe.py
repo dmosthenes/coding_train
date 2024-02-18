@@ -1,8 +1,11 @@
 import pygame
 import random
-import tensorflow as tf
+# import tensorflow as tf
 # import torch
 import numpy as np
+import sys
+
+from npnn import NeuralNetwork
 
 class Bird():
 
@@ -28,7 +31,7 @@ class Bird():
         pygame.draw.circle(self.screen, self.colour, (self.x, self.y), self.radius)
     
     def choice(self, pipe_dst, gap_top, gap_bot):
-        if self.brain.predict(self.y, self.yvelocity, pipe_dst, gap_top, gap_bot) >= 0.5:
+        if np.argmax(self.brain.predict(self.y, self.yvelocity, pipe_dst, gap_top, gap_bot)) == 0:
             self.jump()
 
     def jump(self):
@@ -92,22 +95,15 @@ class Pipe():
 class Brain():
 
     def __init__(self):
-        self.model = tf.keras.Sequential([
-            tf.keras.layers.Input(shape=(5,)),              # Input layer with 6 inputs
-            tf.keras.layers.Dense(2, activation='relu'),    # Hidden layer with 4
-            tf.keras.layers.Dense(1, activation='sigmoid')  # Output layer with 1 
-        ])
-
-        # self.model = torch.
-
+        self.model = NeuralNetwork(5, 4, 2)
     
     def predict(self, y_pos, y_vel, pipe_dst, gap_top, gap_bot):
 
+        # input_data = np.array([y_pos, y_vel, pipe_dst, gap_top, gap_bot])
+
         input_data = [y_pos, y_vel, pipe_dst, gap_top, gap_bot]
 
-        input_data = np.array(input_data)
+        # input_data = input_data.reshape(-1,5)
 
-        input_data = input_data.reshape(-1,5)
-
-        prediction = self.model.predict(input_data)
+        prediction = self.model.feedforward(input_data)
         return prediction
