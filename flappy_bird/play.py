@@ -1,9 +1,8 @@
 import pygame
 import sys
 from bird_and_pipe import Bird, Pipe
-import random
 import copy
-import time
+from time import sleep
 
 def run():
 
@@ -14,7 +13,7 @@ def run():
 
     black = (0,0,0)
 
-    FPS = 30
+    FPS = 90
     clock = pygame.time.Clock()
 
     screen = pygame.display.set_mode((width, height))
@@ -23,10 +22,15 @@ def run():
     # Set pipe generation interval
     INTERVAL = 45
 
-    # Start the timer
-    # timer = pygame.time.get_ticks()
-
     generation = 0
+
+    sample_size = 50
+
+    dead_birds = []
+
+    max_pipes = 0
+
+    font = pygame.font.Font(None, 36)
 
     # Outer while loop initialises each new generation
     while True:
@@ -34,24 +38,62 @@ def run():
         frame_counter = 0
 
         # Initialise game objects
-        birds = [Bird(screen) for _ in range(1000)]
-        # birds = [Bird(screen)]
-        dead_birds = []
+
+        # If first generation, initialise random birds
+        if generation == 0:
+
+            birds = [Bird(screen) for _ in range(sample_size * 10)]
+
+        # If later generation, mutate best birds
+        else:
+
+            # Sort birds by highest score
+            best_birds = sorted(dead_birds, key=lambda x: x.score, reverse=True)
+
+            print(f"Generation: {generation}, Max Distance: {best_birds[0].score}")
+
+            # TODO: birds' scores are not being reset, suggesting
+            # the reinitialisation is not working (likely due to
+            # the location of this print statement)
+            # print(f"Top scores: {birds[0].score}, {birds[1].score}, {birds[2].score}")
+
+            # Pick top n birds and mutate
+            # best_birds = birds[:sample_size]
+
+            # current_best = birds[0]
+
+            # print(current_best.score)
+
+            birds = []
+
+            # for _ in range(sample_size * 10):
+
+            #     birds.append(Bird(screen, current_best, 0.1))
+
+            for bird in best_birds[:10]:
+
+
+                for _ in range(sample_size):
+
+                    birds.extend([Bird(screen, bird, 0.1)])
+
+                    assert birds[0].score == 0
+
+            dead_birds = []
+
+        assert birds != []
+
         pipes = []
 
         # Store reference to the pipe closest to
         # and moving towards player
         current_pipe = None
-        bird_x_pos = copy.copy(birds).pop().x
+        bird_x_pos = birds[0].x
         max_pipe_dst = screen.get_width() - bird_x_pos
 
         generation += 1
 
-        # Count the number of pipes which have passed the player
-        passed_pipes = 0
-
-        # last_pipe_time = pygame.time.get_ticks()
-        # current_time = last_pipe_time
+        pipe_num = 0
 
         # Inner while loop runs a given generation
         while birds:
@@ -65,32 +107,46 @@ def run():
 
             screen.fill(black)
 
-            clock.tick(FPS)
+            # Draw max pipes
+            pipe_counter_surface = font.render(f"Max pipe: {str(max_pipes)}", True, (255,255,255))
+            pipe_counter_rect = pipe_counter_surface.get_rect()
+            pipe_counter_rect.topright = (screen.get_width() * 0.9, screen.get_height() * 0.1)
+            screen.blit(pipe_counter_surface, pipe_counter_rect)
 
-            # current_time = pygame.time.get_ticks()
-            # time_since_last_pipe = current_time - last_pipe_time        
+            # Draw current generation
+            generation_surface = font.render(f"Generation: {str(generation)}", True, (255,255,255))
+            generation_rect = generation_surface.get_rect()
+            generation_rect.topleft = (screen.get_width() * 0.1, screen.get_height() * 0.1)
+            screen.blit(generation_surface, generation_rect)
+
+            # Draw current bird count
+            bird_count_surface = font.render(f"Alive birds: {len(birds)}", True, (255,255,255))
+            bird_count_rect = bird_count_surface.get_rect()
+            bird_count_rect.bottomright = (screen.get_width() * 0.9, screen.get_height() * 0.9)
+            screen.blit(bird_count_surface, bird_count_rect)
+
+            clock.tick(FPS)       
 
             # Add a new pipe every second second
-            # if time_since_last_pipe >= INTERVAL:
             if frame_counter % INTERVAL == 0 or len(pipes) == 0:
-                # last_pipe_time = current_time
-                pipes.append(Pipe(screen))
+                pipes.append(Pipe(screen, pipe_num))
+                pipe_num += 1
 
-            # Update current pipe
+                if pipe_num > max_pipes:
+                    max_pipes = pipe_num
+
+            # Initialise current pipe
             if not current_pipe and len(pipes) > 0:
                 current_pipe = pipes[0]
 
-            elif not current_pipe:
-                pass
-
-            elif current_pipe.toplft[0] + current_pipe.width <= bird_x_pos:
+            # Update current pipe if it has passed the bird
+            if current_pipe.toplft[0] + pipes[0].width < bird_x_pos:
                 current_pipe = pipes[1]
-                passed_pipes += 1
-
+                
                 # Check if 0th pipe is offscreen
                 if pipes[0].toplft[0] + pipes[0].width <= 0:
                     pipes = pipes[1:]
-
+ 
             # Draw all pipes
             for pipe in pipes:
                 pipe.draw()
@@ -98,7 +154,7 @@ def run():
 
             removed_birds = []
 
-            for bird in copy.copy(birds):
+            for bird in birds:
 
                 if current_pipe:
 
@@ -109,10 +165,10 @@ def run():
 
                     # Check boundary and collision
                     if bird.out_of_bounds() or bird.collides(current_pipe):
+                        bird.set_score(pipe_num)
                         removed_birds.append(bird)
-                        birds.remove(bird)
-                        bird.set_score(passed_pipes)
-        
+                        # birds.remove(bird)
+                        
                 bird.update()
                 bird.draw()
 
@@ -127,7 +183,7 @@ def run():
 
 
 def main():
-    time.sleep(3)
+    sleep(5)
     run()
 
 if __name__ == "__main__":

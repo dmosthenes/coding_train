@@ -1,24 +1,24 @@
 import pygame
 import random
-# import tensorflow as tf
-# import torch
 import numpy as np
-import sys
-
 from npnn import NeuralNetwork
 
 class Bird():
 
-    def __init__(self, screen):
+    def __init__(self, screen, bird=None, mutation_rate=None):
         self.radius = 10
         self.gravity = 1
         self.x = 50
         self.y = 50
         self.yvelocity = 0
-        self.colour = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         self.screen = screen
-        self.brain = Brain()
         self.score = 0
+        self.colour = (random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
+
+        if not bird:
+            self.brain = Brain()
+        else:
+            self.brain = bird.brain.mutate(mutation_rate)
 
     def __hash__(self):
         return hash(self.colour)
@@ -26,7 +26,10 @@ class Bird():
     def __eq__(self, other):
         if isinstance(other, Bird):
             return self.colour == other.colour
-
+        
+    def mutate(self, mutation_factor):
+        return self.brain.mutate(mutation_factor)
+        
     def draw(self):
         pygame.draw.circle(self.screen, self.colour, (self.x, self.y), self.radius)
     
@@ -66,18 +69,24 @@ class Bird():
 
 class Pipe():
 
-    def __init__(self, screen):
+    def __init__(self, screen, num):
         self.screen = screen
         self.width = 60
         self.height = self.screen.get_height()
         self.toplft = (self.screen.get_width(), 0)
         self.xvelocity = -10
         self.colour = (255, 255, 255)
+        self.pipe_number = num + 1
 
         # gapy is the the y coordinate for start of gap
         self.gapy = random.randint(self.height * 0.1, self.height * 0.6)
         # gapdst is the height of the gap
         self.gapdst = 100
+
+    def __eq__(self, other):
+        if self.gapy == other.gapy:
+            return True
+        return False
 
     def draw(self):
         pygame.draw.rect(self.screen, self.colour, 
@@ -86,6 +95,13 @@ class Pipe():
         pygame.draw.rect(self.screen, self.colour,
                          (self.toplft[0], self.gapdst + self.gapy,
                           self.width, self.height - self.gapy - self.gapdst))
+        
+        font = pygame.font.Font(None, 44)
+        pipe_count_surface = font.render(f"{self.pipe_number}", True, (0,0,0))
+        pipe_count_rect = pipe_count_surface.get_rect()
+        pipe_count_rect.center = (self.toplft[0] + self.width / 2, self.height * 0.95)
+
+        self.screen.blit(pipe_count_surface, pipe_count_rect)
 
     def update(self):
         # update toplft coordinates
@@ -94,8 +110,12 @@ class Pipe():
 
 class Brain():
 
-    def __init__(self):
-        self.model = NeuralNetwork(5, 4, 2)
+    def __init__(self, model=None):
+
+        if not model:
+            self.model = NeuralNetwork(5, 4, 2)
+        else:
+            self.model = model
     
     def predict(self, y_pos, y_vel, pipe_dst, gap_top, gap_bot):
 
@@ -107,3 +127,17 @@ class Brain():
 
         prediction = self.model.feedforward(input_data)
         return prediction
+    
+    def mutate(self, mutation_factor):
+
+        new_model = self.model.copy()
+
+        new_model.mutate(mutation_factor)
+
+        return Brain(new_model)
+
+    def __eq__(self, other):
+
+        if self.model == other.model:
+            return True
+        return False

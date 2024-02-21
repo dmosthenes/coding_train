@@ -20,6 +20,11 @@ class NeuralNetwork():
         self.weights_ho = np.random.uniform(-1, 1, size=(self.output, self.hidden))
         self.bias_ho = np.ones((self.output, 1))
 
+    def __eq__(self, other):
+        if (self.weights_ih == other.weights_ih).all() and (self.bias_ih == other.bias_ih).all() and (self.weights_ho == other.weights_ho).all() and (self.bias_ho == other.bias_ho).all():
+            return True
+        return False
+    
     def sigmoid(self, matrix):
         return 1 / (1 + np.exp(-matrix))
     
@@ -29,10 +34,10 @@ class NeuralNetwork():
         """
 
         copy = NeuralNetwork(self.input, self.hidden, self.output)
-        copy.weights_ih = self.weights_ih
-        copy.bias_ih = self.bias_ih
-        copy.weights_ho = self.weights_ho
-        copy.bias_ho = self.bias_ho
+        copy.weights_ih = np.copy(self.weights_ih)
+        copy.bias_ih = np.copy(self.bias_ih)
+        copy.weights_ho = np.copy(self.weights_ho)
+        copy.bias_ho = np.copy(self.bias_ho)
         return copy
     
     def mutate(self, mutation_factor):
@@ -41,8 +46,15 @@ class NeuralNetwork():
         the given factor.
         """
 
-        
+        # mutation_factor chance to add random amount
+        # between -1 and 1 to each bias
 
+        weights = [self.weights_ih, self.weights_ho, self.bias_ih, self.bias_ho]
+
+        for i, _ in enumerate(weights):
+            if np.random.uniform(0,1) < mutation_factor:
+
+                weights[i] += np.random.uniform(-0.1,0.1, size=weights[i].shape)
 
 
     def feedforward(self, input_features):
@@ -116,6 +128,3 @@ class NeuralNetwork():
 
 
         # Update the model's weights
-
-
-
